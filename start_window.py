@@ -11,13 +11,14 @@ class StartWindow(arcade.Window):
     def __init__(self, width, height, title):
         super().__init__(width, height, title)
         self.background = arcade.load_texture("images/windows/start_window.png")
+        self.click_btn_sound = arcade.load_sound("sounds/click_btn.ogg")
 
         self.manager = UIManager()
         self.manager.enable()
 
         self.anchor_layout = UIAnchorLayout()
-        self.box_layout = UIBoxLayout(vertical=True, space_between=10)
-        self.box_layout = self.box_layout.with_padding(top=450, left=25)
+        self.box_layout = UIBoxLayout(vertical=True, space_between=12)
+        self.box_layout = self.box_layout.with_padding(top=460, left=25)
 
         self.setup_widgets()
 
@@ -38,31 +39,38 @@ class StartWindow(arcade.Window):
         texture3_hovered = arcade.load_texture("images/buttons/end_button/hovered.png")
         texture3_pressed = arcade.load_texture("images/buttons/end_button/pressed.png")
 
-        btn1 = UITextureButton(texture=texture1_normal,
+        self.btn1 = UITextureButton(texture=texture1_normal,
                                texture_hovered=texture1_hovered,
                                texture_pressed=texture1_pressed,
                                scale=0.5,
                                anchor_x="center")
-        btn1.on_click = ...
-        self.box_layout.add(btn1)
+        self.btn1.on_click = self.start_game
+        self.box_layout.add(self.btn1)
 
-        btn2 = UITextureButton(texture=texture2_normal,
+        self.btn2 = UITextureButton(texture=texture2_normal,
                                texture_hovered=texture2_hovered,
                                texture_pressed=texture2_pressed,
                                scale=0.5,
                                anchor_x="center")
-        btn2.on_click = ...
-        self.box_layout.add(btn2)
+        self.btn2.on_click = self.achievements_window
+        self.box_layout.add(self.btn2)
 
-        btn3 = UITextureButton(texture=texture3_normal,
+        self.btn3 = UITextureButton(texture=texture3_normal,
                                texture_hovered=texture3_hovered,
                                texture_pressed=texture3_pressed,
                                scale=0.5,
                                anchor_x="center")
-        btn3.on_click = self.exit_game
-        self.box_layout.add(btn3)
+        self.btn3.on_click = self.exit_game
+        self.box_layout.add(self.btn3)
+
+    def start_game(self, event):
+        self.btn1.on_click = arcade.play_sound(self.click_btn_sound)
+
+    def achievements_window(self, event):
+        self.btn2.on_click = arcade.play_sound(self.click_btn_sound)
 
     def exit_game(self, event):
+        self.btn3.on_click = arcade.play_sound(self.click_btn_sound)
         arcade.exit()
 
     def setup(self):
