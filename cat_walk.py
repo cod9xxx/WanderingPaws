@@ -10,7 +10,7 @@ ANIMATION_SPEED = 0.15
 class Cat(arcade.Sprite):
     def __init__(self, x, y):
         super().__init__()
-        self.texture = arcade.load_texture("images/forward1.png")
+        self.texture = arcade.load_texture("images/cat_animation/forward1.png")
         self.scale = 0.15
         self.center_x = x
         self.center_y = y
@@ -25,31 +25,31 @@ class Cat(arcade.Sprite):
 
         # Анимации
         self.textures_forward = [
-            arcade.load_texture("images/forward1.png"),
-            arcade.load_texture("images/forward2.png"),
-            arcade.load_texture("images/forward1.png"),
-            arcade.load_texture("images/forward2.png").flip_horizontally()
+            arcade.load_texture("images/cat_animation/forward1.png"),
+            arcade.load_texture("images/cat_animation/forward2.png"),
+            arcade.load_texture("images/cat_animation/forward1.png"),
+            arcade.load_texture("images/cat_animation/forward2.png").flip_horizontally()
         ]
 
         self.textures_backward = [
-            arcade.load_texture("images/back1.png"),
-            arcade.load_texture("images/back2.png"),
-            arcade.load_texture("images/back1.png"),
-            arcade.load_texture("images/back2.png").flip_horizontally()
+            arcade.load_texture("images/cat_animation/back1.png"),
+            arcade.load_texture("images/cat_animation/back2.png"),
+            arcade.load_texture("images/cat_animation/back1.png"),
+            arcade.load_texture("images/cat_animation/back2.png").flip_horizontally()
         ]
 
         self.textures_right = [
-            arcade.load_texture("images/right1.png"),
-            arcade.load_texture("images/right2.png"),
-            arcade.load_texture("images/right1.png"),
-            arcade.load_texture("images/right3.png")
+            arcade.load_texture("images/cat_animation/right1.png"),
+            arcade.load_texture("images/cat_animation/right2.png"),
+            arcade.load_texture("images/cat_animation/right1.png"),
+            arcade.load_texture("images/cat_animation/right3.png")
         ]
 
         self.textures_left = [
-            arcade.load_texture("images/right1.png").flip_horizontally(),
-            arcade.load_texture("images/right2.png").flip_horizontally(),
-            arcade.load_texture("images/right1.png").flip_horizontally(),
-            arcade.load_texture("images/right3.png").flip_horizontally()
+            arcade.load_texture("images/cat_animation/right1.png").flip_horizontally(),
+            arcade.load_texture("images/cat_animation/right2.png").flip_horizontally(),
+            arcade.load_texture("images/cat_animation/right1.png").flip_horizontally(),
+            arcade.load_texture("images/cat_animation/right3.png").flip_horizontally()
         ]
 
     def update(self, delta_time):
