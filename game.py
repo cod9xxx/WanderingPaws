@@ -3,6 +3,7 @@ import csv
 from arcade.gui import UIManager, UITextureButton
 from arcade.gui.widgets.layout import UIAnchorLayout, UIBoxLayout
 
+from fade_class import FadeView
 
 SCREEN_WIDTH = 1536
 SCREEN_HEIGHT = 960
@@ -13,9 +14,11 @@ class GameWindow(arcade.Window):
     """ Главное окно игры """
     def __init__(self, width, height, title):
         super().__init__(width, height, title, resizable=True)
+        self.start_music = arcade.load_sound("sounds/start_window.mp3")
+        self.music_player = arcade.play_sound(self.start_music, loop=True)
 
 
-class StartView(arcade.View):
+class StartView(FadeView):
     def __init__(self):
         super().__init__()
 
@@ -77,12 +80,12 @@ class StartView(arcade.View):
 
     def start_game(self, event):
         arcade.play_sound(self.click_btn_sound)
-        self.window.show_view(IntroDialogView())
+        self.start_fade_out(IntroDialogView())
         self.manager.disable()
 
     def achievements_window(self, event):
         arcade.play_sound(self.click_btn_sound)
-        self.window.show_view(AchievementsView())
+        self.start_fade_out(AchievementsView())
         self.manager.disable()
 
     def exit_game(self, event):
@@ -94,11 +97,14 @@ class StartView(arcade.View):
         arcade.draw_texture_rect(self.background, arcade.rect.LBWH(
             0, 0, self.width, self.height))
         self.manager.draw()
+        self.draw_fade()
 
 
-class IntroDialogView(arcade.View):
+class IntroDialogView(FadeView):
     def __init__(self):
         super().__init__()
+        arcade.stop_sound(self.window.music_player)
+        arcade.play_sound(arcade.load_sound("sounds/2.mp3"), loop=True)
         self.background = arcade.load_texture("images/windows/dialogs_background.jpg")
         self.background_with_islands = arcade.load_texture("images/windows/dialogs_background_with_islands.jpg")
 
@@ -141,6 +147,7 @@ class IntroDialogView(arcade.View):
         self.full_text = current["text"]
 
     def on_update(self, delta_time):
+        super().on_update(delta_time)
         if self.is_typing:
             self.text_timer += delta_time
             if self.text_timer >= self.text_speed:
@@ -154,7 +161,10 @@ class IntroDialogView(arcade.View):
 
     def on_draw(self):
         self.clear()
-        if self.dialogue_index < 10:
+        if self.dialogue_index >= len(self.dialog):
+            return
+
+        if self.dialogue_index < 9:
             arcade.draw_texture_rect(self.background, arcade.rect.LBWH(
             0, 0, self.window.width, self.window.height))
         else:
@@ -173,6 +183,8 @@ class IntroDialogView(arcade.View):
         arcade.draw_text(speaker, 85, 260, arcade.color.WHITE, 30)
         arcade.draw_text(self.visible_text, 100, 130, arcade.color.WHITE, 26, width=1400, multiline=True)
 
+        self.draw_fade()
+
     def on_mouse_press(self, x, y, button, modifiers):
         if self.is_typing:
             self.visible_text = self.full_text
@@ -183,22 +195,60 @@ class IntroDialogView(arcade.View):
             if self.dialogue_index < len(self.dialog):
                 self.start_typing()
             else:
-                self.window.show_view(IslandsMapView())
+                self.start_fade_out(IslandsMapView())
 
 
-class AchievementsView(arcade.View):
+class AchievementsView(FadeView):
     def __init__(self):
         super().__init__()
-        arcade.set_background_color(arcade.color.WHITE)
+        self.background = arcade.load_texture("images/windows/achievements_window.jpg")
+        self.click_btn_sound = arcade.load_sound("sounds/achievements_button_click.mp3")
 
+        self.manager = UIManager()
+        self.manager.enable()
+        self.setup_widgets()
 
-class IslandsMapView(arcade.View):
-    def __init__(self):
-        super().__init__()
-        arcade.set_background_color(arcade.color.WHITE)
+    def setup_widgets(self):
+        # Кнопка Назад
+        texture1_normal = arcade.load_texture("images/buttons/back_button/normal.png").flip_horizontally()
+        texture1_hovered = arcade.load_texture("images/buttons/back_button/hovered.png").flip_horizontally()
+        texture1_pressed = arcade.load_texture("images/buttons/back_button/pressed.png").flip_horizontally()
+
+        # Кнопка Начать
+        self.back_btn = UITextureButton(texture=texture1_normal,
+                                    texture_hovered=texture1_hovered,
+                                    texture_pressed=texture1_pressed,
+                                    scale=0.3,
+                                    anchor_x="center",
+                                    x=20, y=600)
+
+        self.back_btn.on_click = self.back_to_main
+        self.manager.add(self.back_btn)
+
+    def back_to_main(self, event):
+        arcade.play_sound(self.click_btn_sound)
+        self.start_fade_out(StartView())
+        self.manager.disable()
 
     def on_draw(self):
         self.clear()
+        arcade.draw_texture_rect(self.background, arcade.rect.LBWH(
+            0, 0, self.window.width, self.window.height))
+        self.manager.draw()
+        self.draw_fade()
+
+
+class IslandsMapView(FadeView):
+    def __init__(self):
+        super().__init__()
+        self.background = arcade.load_texture("images/windows/main_islands_window.png")
+
+    def on_draw(self):
+        self.clear()
+        arcade.draw_texture_rect(self.background, arcade.rect.LBWH(
+            0, 0, self.window.width, self.window.height))
+
+        self.draw_fade()
 
 
 def setup_game(width=1920, height=1080, title="Wandering Paws"):
@@ -214,6 +264,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-
