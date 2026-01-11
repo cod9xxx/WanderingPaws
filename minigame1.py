@@ -14,18 +14,31 @@ HOLE_SIZE = 40
 MOUSE_SIZE = 30
 CAT_SIZE = 60
 
+MOUSE_SCALE = 0.15
+MOUSE_ANIM_SPEED = 0.2  # секунды на кадр
 
 class Mouse(arcade.Sprite):
-    def __init__(self, start_x, start_y, end_x, end_y, speed=400):
-        super().__init__("images/minigame1/mouse.png", scale=0.1)
+    """Анимированная мышка из 2 кадров"""
 
+    def __init__(self, start_x, start_y, end_x, end_y, speed=400):
+        # первый кадр по умолчанию
+        super().__init__("images/minigame1/mouse.png", scale=MOUSE_SCALE)
+
+        # загружаем второй кадр
+        self.mouse_texture1 = arcade.load_texture("images/minigame1/mouse1.png")
+        self.frames = [self.texture, self.mouse_texture1]
+
+        self.cur_frame_index = 0
+        self.time_since_last_frame = 0
+
+        # параметры движения
         self.center_x = start_x
         self.center_y = start_y
         self.start_x = start_x
         self.start_y = start_y
         self.end_x = end_x
         self.end_y = end_y
-        self.speed = speed  # пиксели в секунду
+        self.speed = speed
         self.traveled = 0
         self.total_distance = ((end_x - start_x) ** 2 + (end_y - start_y) ** 2) ** 0.5
 
@@ -33,19 +46,32 @@ class Mouse(arcade.Sprite):
         if self.total_distance == 0:
             return
 
+        # движение
         distance_per_frame = self.speed * delta_time
         self.traveled += distance_per_frame
-
         progress = min(self.traveled / self.total_distance, 1.0)
 
-        # Интерполируем позицию
         self.center_x = self.start_x + (self.end_x - self.start_x) * progress
         self.center_y = self.start_y + (self.end_y - self.start_y) * progress
 
         dx = self.end_x - self.start_x
         dy = self.end_y - self.start_y
         angle = math.atan2(dy, dx)
-        self.angle = -angle  # отрицательный угол, потому что y-ось перевернута
+        angle_deg = math.degrees(angle)
+
+        angle_deg = angle_deg % 360
+        if angle_deg > 180:
+            angle_deg -= 360
+        elif angle_deg < -180:
+            angle_deg += 360
+
+        self.angle = angle_deg * -1
+
+        self.time_since_last_frame += delta_time
+        if self.time_since_last_frame >= MOUSE_ANIM_SPEED:
+            self.time_since_last_frame = 0
+            self.cur_frame_index = (self.cur_frame_index + 1) % 2
+            self.texture = self.frames[self.cur_frame_index]
 
         if progress >= 1.0:
             self.kill()
@@ -83,15 +109,21 @@ class GameWindow(arcade.Window):
         ]
 
         arcade.set_background_color(arcade.color.DARK_BROWN)
+        self.background_texture = arcade.load_texture("images/minigame1/floor.png")
 
         self.set_mouse_visible(False)
 
     def setup(self):
-        self.cat_sprite = arcade.Sprite("images/minigame1/cat.png", scale=0.2)
+        self.cat_sprite = arcade.Sprite("images/minigame1/cat.png", scale=0.15)
         self.all_sprites_list.append(self.cat_sprite)
+
+        self.mice_list = arcade.SpriteList()
 
     def on_draw(self):
         self.clear()
+
+        arcade.draw_texture_rect(self.background_texture,
+                                 arcade.rect.XYWH(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, SCREEN_WIDTH, SCREEN_HEIGHT))
 
         self.draw_walls()
 
@@ -132,17 +164,13 @@ class GameWindow(arcade.Window):
             arcade.draw_circle_outline(hole_x, hole_y, HOLE_SIZE // 2, arcade.color.LIGHT_BROWN, 2)
 
     def draw_ui(self):
-        time_text = f"Время: {int(self.time_left)}s"
-        arcade.draw_text(time_text, 20, SCREEN_HEIGHT - 40,
-                         arcade.color.WHITE, 18, bold=True)
+        needed_text = f"ЛОВИ МЫШЕЙ!"
+        arcade.draw_text(needed_text, SCREEN_WIDTH // 2 - 180, SCREEN_HEIGHT - 40,
+                         arcade.color.YELLOW, 42, bold=True)
 
-        score_text = f"Мышек: {self.score}/{GAME_TIME * 2}"
-        arcade.draw_text(score_text, 20, SCREEN_HEIGHT - 80,
-                         arcade.color.LIGHT_CYAN, 18, bold=True)
-
-        needed_text = f"Нужно: {MICE_NEEDED_FOR_WIN}"
-        arcade.draw_text(needed_text, SCREEN_WIDTH - 220, SCREEN_HEIGHT - 40,
-                         arcade.color.YELLOW, 18, bold=True)
+        time_text = f"{int(self.time_left)}s"
+        arcade.draw_text(time_text, SCREEN_WIDTH // 2 - 25, SCREEN_HEIGHT - 100,
+                         arcade.color.WHITE, 36, bold=True)
 
         if self.game_state == "won":
             self.draw_win_screen()
@@ -150,10 +178,14 @@ class GameWindow(arcade.Window):
             self.draw_lose_screen()
 
     def draw_win_screen(self):
+
+        self.all_sprites_list.clear()
+        self.mice_list.clear()
+
         arcade.draw_lbwh_rectangle_filled(
             100, 100,
             SCREEN_WIDTH - 200, SCREEN_HEIGHT - 200,
-            (100, 20, 20, 200)
+            (20, 150, 20, 200)
         )
 
         arcade.draw_text(
@@ -163,9 +195,9 @@ class GameWindow(arcade.Window):
         )
 
         stars = STARS.get(min(self.score, 20), 0)
-        if self.score >= 20:
+        if self.score >= 30:
             stars = 3
-        elif self.score >= 15:
+        elif self.score >= 20:
             stars = 2
         elif self.score >= 10:
             stars = 1
@@ -191,10 +223,14 @@ class GameWindow(arcade.Window):
         )
 
     def draw_lose_screen(self):
+
+        self.all_sprites_list.clear()
+        self.mice_list.clear()
+
         arcade.draw_lbwh_rectangle_filled(
             150, 150,
             SCREEN_WIDTH - 300, SCREEN_HEIGHT - 300,
-            (100, 20, 20, 200)
+            (150, 20, 20, 200)
         )
 
         arcade.draw_text(
@@ -224,6 +260,7 @@ class GameWindow(arcade.Window):
 
         self.all_sprites_list.update()
         self.mice_list.update()
+        self.mice_list.update_animation(delta_time)
 
         self.mouse_spawn_timer += delta_time
         if self.mouse_spawn_timer >= self.spawn_interval:
