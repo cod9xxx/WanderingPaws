@@ -52,5 +52,3 @@ class FadeView(arcade.View):
             arcade.draw_rect_filled(arcade.rect.XYWH(self.window.width // 2,
                     self.window.height // 2, self.window.width, self.window.height),
                     (0, 0, 0, int(self.fade_alpha)))
-
-

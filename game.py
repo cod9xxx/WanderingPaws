@@ -1,9 +1,10 @@
 import arcade
 import csv
-from arcade.gui import UIManager, UITextureButton
+from arcade.gui import UIManager, UITextureButton, UIImage
 from arcade.gui.widgets.layout import UIAnchorLayout, UIBoxLayout
 
 from fade_class import FadeView
+from achievements_class import *
 
 SCREEN_WIDTH = 1536
 SCREEN_HEIGHT = 960
@@ -104,7 +105,7 @@ class IntroDialogView(FadeView):
     def __init__(self):
         super().__init__()
         arcade.stop_sound(self.window.music_player)
-        arcade.play_sound(arcade.load_sound("sounds/2.mp3"), loop=True)
+        arcade.play_sound(arcade.load_sound("sounds/dialogue.mp3"), loop=True)
         self.background = arcade.load_texture("images/windows/dialogs_background.jpg")
         self.background_with_islands = arcade.load_texture("images/windows/dialogs_background_with_islands.jpg")
 
@@ -122,8 +123,15 @@ class IntroDialogView(FadeView):
         self.all_sprites.append(self.cat)
         self.all_sprites.append(self.dialogue_box)
 
+        self.islands_alpha = 0
+        self.islands_fade_speed = 10
+        self.show_islands = False
+
         self.is_typing = False
         self.load_dialogue()
+
+        if self.dialogue_index <= 6:
+            self.show_islands = True
 
     def load_dialogue(self):
         self.dialog = []
@@ -148,6 +156,10 @@ class IntroDialogView(FadeView):
 
     def on_update(self, delta_time):
         super().on_update(delta_time)
+        if self.show_islands and self.islands_alpha < 255:
+            # Плавное появление островов
+            self.islands_alpha += self.islands_fade_speed * delta_time
+            self.islands_alpha = min(self.islands_alpha, 255)
         if self.is_typing:
             self.text_timer += delta_time
             if self.text_timer >= self.text_speed:
@@ -164,12 +176,12 @@ class IntroDialogView(FadeView):
         if self.dialogue_index >= len(self.dialog):
             return
 
-        if self.dialogue_index < 9:
-            arcade.draw_texture_rect(self.background, arcade.rect.LBWH(
+        arcade.draw_texture_rect(self.background, arcade.rect.LBWH(
             0, 0, self.window.width, self.window.height))
-        else:
+
+        if self.show_islands:
             arcade.draw_texture_rect(self.background_with_islands, arcade.rect.LBWH(
-                0, 0, self.window.width, self.window.height))
+                0, 0, self.window.width, self.window.height), alpha=self.islands_alpha)
 
         # Диалог
         current = self.dialog[self.dialogue_index]
@@ -202,25 +214,57 @@ class AchievementsView(FadeView):
     def __init__(self):
         super().__init__()
         self.background = arcade.load_texture("images/windows/achievements_window.jpg")
-        self.click_btn_sound = arcade.load_sound("sounds/achievements_button_click.mp3")
+        self.click_btn_sound = arcade.load_sound("sounds/click_btn.ogg")
 
         self.manager = UIManager()
         self.manager.enable()
+
+        self.row1_layout = UIBoxLayout(vertical=False, space_between=20)
+        self.row2_layout = UIBoxLayout(vertical=False, space_between=20)
+
+        self.vertical_box = UIBoxLayout(vertical=True, space_between=20)
+        self.vertical_box.add(self.row1_layout)
+        self.vertical_box.add(self.row2_layout)
+        self.vertical_box = self.vertical_box.with_padding(top=100)
+
+        self.anchor_layout = UIAnchorLayout()
+        self.anchor_layout.add(self.vertical_box)
+
+        self.manager.add(self.anchor_layout)
+        self.load_achievements()
         self.setup_widgets()
+
+    def load_achievements(self):
+        self.images = []
+        for achievement in ACHIEVEMENTS:
+            ach = achievement["name"]
+            if players_achievements.get(ach, False):
+                texture = arcade.load_texture(achievement["icon"])
+                image = UIImage(texture=texture, width=230, height=230)
+            else:
+                texture = arcade.load_texture(achievement["icon_locked"])
+                image = UIImage(texture=texture, width=230, height=230, alpha=200)
+
+            self.images.append(image)
+
+        for i in range(0, 5):
+            self.row1_layout.add(self.images[i])
+
+        for i in range(5, 9):
+            self.row2_layout.add(self.images[i])
 
     def setup_widgets(self):
         # Кнопка Назад
         texture1_normal = arcade.load_texture("images/buttons/back_button/normal.png").flip_horizontally()
-        texture1_hovered = arcade.load_texture("images/buttons/back_button/hovered.png").flip_horizontally()
-        texture1_pressed = arcade.load_texture("images/buttons/back_button/pressed.png").flip_horizontally()
+        texture1_hovered = arcade.load_texture("images/buttons/back_button/hovered.PNG").flip_horizontally()
+        texture1_pressed = arcade.load_texture("images/buttons/back_button/pressed.PNG").flip_horizontally()
 
-        # Кнопка Начать
         self.back_btn = UITextureButton(texture=texture1_normal,
-                                    texture_hovered=texture1_hovered,
-                                    texture_pressed=texture1_pressed,
-                                    scale=0.3,
-                                    anchor_x="center",
-                                    x=20, y=600)
+                                        texture_hovered=texture1_hovered,
+                                        texture_pressed=texture1_pressed,
+                                        scale=0.15,
+                                        anchor_x="center",
+                                        x=20, y=725)
 
         self.back_btn.on_click = self.back_to_main
         self.manager.add(self.back_btn)
