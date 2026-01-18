@@ -286,11 +286,37 @@ class IslandsMapView(FadeView):
     def __init__(self):
         super().__init__()
         self.background = arcade.load_texture("images/windows/main_islands_window.png")
+        self.click_btn_sound = arcade.load_sound("sounds/click_btn.ogg")
+
+        self.manager = UIManager()
+        self.manager.enable()
+        self.setup_widgets()
+
+    def setup_widgets(self):
+        texture1_normal = arcade.load_texture("images/buttons/home_button/normal.png")
+        texture1_hovered = arcade.load_texture("images/buttons/home_button/hovered.PNG")
+        texture1_pressed = arcade.load_texture("images/buttons/home_button/pressed.PNG")
+
+        self.home_btn = UITextureButton(texture=texture1_normal,
+                                        texture_hovered=texture1_hovered,
+                                        texture_pressed=texture1_pressed,
+                                        scale=0.15,
+                                        anchor_x="center",
+                                        x=0, y=735)
+
+        self.home_btn.on_click = self.back_to_main
+        self.manager.add(self.home_btn)
+
+    def back_to_main(self, event):
+        arcade.play_sound(self.click_btn_sound)
+        self.start_fade_out(StartView())
+        self.manager.disable()
 
     def on_draw(self):
         self.clear()
         arcade.draw_texture_rect(self.background, arcade.rect.LBWH(
             0, 0, self.window.width, self.window.height))
+        self.manager.draw()
 
         self.draw_fade()
 
