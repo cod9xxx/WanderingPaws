@@ -10,7 +10,7 @@ SCREEN_TITLE = "Прямоугольный пазл 6x4"
 ROW_COUNT = 4
 COL_COUNT = 6
 
-IMAGE_PATH = "images/puzzle/puzzle.png"
+IMAGE_PATH = "images/puzzle/puzzle_image.jpg"
 
 
 class JigsawPiece(arcade.Sprite):
