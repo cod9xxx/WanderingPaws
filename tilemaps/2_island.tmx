@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="65" height="45" tilewidth="16" tileheight="16" infinite="0" nextlayerid="14" nextobjectid="1">
- <tileset firstgid="1" source="../images/tilesets/tiles/island_tileset.tsx"/>
- <tileset firstgid="2337" source="../images/tilesets/tiles/rocks1.tsx"/>
- <tileset firstgid="3873" source="../images/tilesets/tiles/bushes_tileset.tsx"/>
- <tileset firstgid="4049" source="../images/tilesets/tiles/beach_main_tileset.tsx"/>
- <tileset firstgid="4576" source="../images/tilesets/tiles/desert_tileset.tsx"/>
- <tileset firstgid="5013" source="../images/tilesets/tiles/collision.tsx"/>
+ <tileset firstgid="1" name="island_tileset" tilewidth="16" tileheight="16" tilecount="2336" columns="32">
+  <image source="../images/tilesets/images/island.png" width="512" height="1168"/>
+ </tileset>
+ <tileset firstgid="2337" name="rocks1" tilewidth="16" tileheight="16" tilecount="1536" columns="32">
+  <image source="../images/tilesets/images/rocks1.PNG" width="512" height="768"/>
+ </tileset>
+ <tileset firstgid="3873" name="bushes_tileset" tilewidth="16" tileheight="16" tilecount="176" columns="8">
+  <image source="../images/tilesets/images/bushes.png" width="128" height="352"/>
+ </tileset>
+ <tileset firstgid="4049" name="beach_main_tileset" tilewidth="16" tileheight="16" tilecount="527" columns="17">
+  <image source="../images/tilesets/images/beach_main.png" width="272" height="496"/>
+ </tileset>
+ <tileset firstgid="4576" name="desert_tileset" tilewidth="16" tileheight="16" tilecount="437" columns="19">
+  <image source="../images/tilesets/images/desert.png" width="304" height="368"/>
+ </tileset>
+ <tileset firstgid="5013" name="collision" tilewidth="16" tileheight="16" tilecount="1170" columns="39">
+  <image source="../images/tilesets/images/collision.jpg" width="626" height="488"/>
+ </tileset>
  <layer id="3" name="sea" width="65" height="45">
   <data encoding="csv">
 200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,200,

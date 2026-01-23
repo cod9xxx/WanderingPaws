@@ -25,6 +25,9 @@ class MyGame(arcade.Window):
     def __init__(self):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
 
+        self.start_music = arcade.load_sound("sounds/4.mp3")
+        self.music_player = arcade.play_sound(self.start_music, loop=True)
+
         self.piece_list = None
         self.background_list = None
         self.held_piece = None
