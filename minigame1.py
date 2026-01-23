@@ -18,13 +18,9 @@ MOUSE_SCALE = 0.15
 MOUSE_ANIM_SPEED = 0.2  # секунды на кадр
 
 class Mouse(arcade.Sprite):
-    """Анимированная мышка из 2 кадров"""
-
     def __init__(self, start_x, start_y, end_x, end_y, speed=400):
-        # первый кадр по умолчанию
         super().__init__("images/minigame1/mouse.png", scale=MOUSE_SCALE)
 
-        # загружаем второй кадр
         self.mouse_texture1 = arcade.load_texture("images/minigame1/mouse1.png")
         self.frames = [self.texture, self.mouse_texture1]
 
@@ -46,7 +42,6 @@ class Mouse(arcade.Sprite):
         if self.total_distance == 0:
             return
 
-        # движение
         distance_per_frame = self.speed * delta_time
         self.traveled += distance_per_frame
         progress = min(self.traveled / self.total_distance, 1.0)
@@ -81,6 +76,9 @@ class GameWindow(arcade.Window):
 
     def __init__(self):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+
+        self.start_music = arcade.load_sound("sounds/mario.mp3")
+        self.music_player = arcade.play_sound(self.start_music, loop=True)
 
         self.all_sprites_list = arcade.SpriteList()
         self.mice_list = arcade.SpriteList()
