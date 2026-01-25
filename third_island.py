@@ -14,7 +14,7 @@ UP_FACING = 2
 DOWN_FACING = 3
 UPDATES_PER_FRAME = 10
 
-MAP_NAME = "tilemaps/4_island.tmx"
+MAP_NAME = "tilemaps/3_island.tmx"
 
 def main():
     window = MyGame(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, MAP_NAME, UPDATES_PER_FRAME, PLAYER_MOVEMENT_SPEED)
