@@ -6,6 +6,8 @@ from arcade.gui.widgets.layout import UIAnchorLayout, UIBoxLayout
 from fade_class import FadeView
 from constants import *
 
+from basic_level_logic import *
+
 SCREEN_WIDTH = 1536
 SCREEN_HEIGHT = 960
 SCREEN_TITLE = "Wandering Paws"
@@ -288,6 +290,8 @@ class IslandsMapView(FadeView):
         self.background = arcade.load_texture("images/windows/main_islands_window.png")
         self.click_btn_sound = arcade.load_sound("sounds/click_btn.ogg")
 
+        self.cur_island = None
+
         self.manager = UIManager()
         self.manager.enable()
         self.setup_widgets()
@@ -362,15 +366,30 @@ class IslandsMapView(FadeView):
 
     def open_island(self, island_id):
         if island_id == 1:
-            self.start_fade_out(FirstIslandView())
+            self.cur_island = IslandLevel('tilemaps/1_island.tmx')
+            self.start_fade_out(self.cur_island)
+            self.cur_island.setup()
+            arcade.run()
         elif island_id == 2:
-            self.start_fade_out(SecondIslandView())
+            self.cur_island = IslandLevel('tilemaps/2_island.tmx')
+            self.start_fade_out(self.cur_island)
+            self.cur_island.setup()
+            arcade.run()
         elif island_id == 3:
-            self.start_fade_out(ThirdIslandView())
+            self.cur_island = IslandLevel('tilemaps/3_island.tmx')
+            self.start_fade_out(self.cur_island)
+            self.cur_island.setup()
+            arcade.run()
         elif island_id == 4:
-            self.start_fade_out(FourthIslandView())
+            self.cur_island = IslandLevel('tilemaps/4_island.tmx')
+            self.start_fade_out(self.cur_island)
+            self.cur_island.setup()
+            arcade.run()
         elif island_id == 5:
-            self.start_fade_out(FifthIslandView())
+            self.cur_island = IslandLevel('tilemaps/5_island.tmx')
+            self.start_fade_out(self.cur_island)
+            self.cur_island.setup()
+            arcade.run()
 
 
 class IslandZone:
@@ -388,38 +407,38 @@ class IslandZone:
         )
 
 
-class FirstIslandView(FadeView):
-    def __init__(self):
-        super().__init__()
-        arcade.set_background_color(arcade.color.RED)
-
-    def on_draw(self):
-        self.clear()
-        self.draw_fade()
-
-
-class SecondIslandView(FadeView):
-    def __init__(self):
-        super().__init__()
-        arcade.set_background_color(arcade.color.ORANGE)
-
-
-class ThirdIslandView(FadeView):
-    def __init__(self):
-        super().__init__()
-        ...
-
-
-class FourthIslandView(FadeView):
-    def __init__(self):
-        super().__init__()
-        ...
-
-
-class FifthIslandView(FadeView):
-    def __init__(self):
-        super().__init__()
-        ...
+# class FirstIslandView(FadeView):
+#     def __init__(self):
+#         super().__init__()
+#         arcade.set_background_color(arcade.color.RED)
+#
+#     def on_draw(self):
+#         self.clear()
+#         self.draw_fade()
+#
+#
+# class SecondIslandView(FadeView):
+#     def __init__(self):
+#         super().__init__()
+#         arcade.set_background_color(arcade.color.ORANGE)
+#
+#
+# class ThirdIslandView(FadeView):
+#     def __init__(self):
+#         super().__init__()
+#         ...
+#
+#
+# class FourthIslandView(FadeView):
+#     def __init__(self):
+#         super().__init__()
+#         ...
+#
+#
+# class FifthIslandView(FadeView):
+#     def __init__(self):
+#         super().__init__()
+#         ...
 
 
 def setup_game(width=1920, height=1080, title="Wandering Paws"):

@@ -2,7 +2,6 @@ import arcade
 
 
 class FadeView(arcade.View):
-    """ Класс для создания плавных переходов при смене окон"""
     def __init__(self):
         super().__init__()
 

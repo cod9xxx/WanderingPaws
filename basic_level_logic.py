@@ -95,15 +95,15 @@ class PlayerCharacter(arcade.Sprite):
         self.texture = textures[frame_index]
 
 
-class MyGame(FadeView):
-    def __init__(self, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, MAP_NAME, UPDATES_PER_FRAME, PLAYER_MOVEMENT_SPEED):
-        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, resizable=False)
+class IslandLevel(FadeView):
+    def __init__(self, map_name):
+        super().__init__()
         self.start_music = arcade.load_sound("sounds/sunshine.mp3")
         self.music_player = arcade.play_sound(self.start_music, volume=0.3, loop=True)
 
-        self.updates_per_frame = UPDATES_PER_FRAME
-        self.map_name = MAP_NAME
-        self.player_movement_speed = PLAYER_MOVEMENT_SPEED
+        self.updates_per_frame = 10
+        self.map_name = map_name
+        self.player_movement_speed = 4
 
         self.collision = None
         self.scene = None
