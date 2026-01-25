@@ -1,3 +1,16 @@
+import arcade
+
+
+ISLANDS_PROGRESS = {
+    1: True,
+    2: False,
+    3: False,
+    4: False,
+    5: False
+}
+
+EMPTY_TEXTURE = arcade.make_soft_square_texture(size=1, color=arcade.color.WHITE,
+                                                outer_alpha=0, center_alpha=0)
 ACHIEVEMENTS = [
     {
         "name" : "Забытая попытка",

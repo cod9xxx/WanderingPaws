@@ -1,6 +1,8 @@
 import random
 import arcade
 
+from fade_class import FadeView
+
 
 class PlayerCharacter(arcade.Sprite):
     def __init__(self, updates_per_frame):
@@ -93,7 +95,7 @@ class PlayerCharacter(arcade.Sprite):
         self.texture = textures[frame_index]
 
 
-class MyGame(arcade.Window):
+class MyGame(FadeView):
     def __init__(self, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, MAP_NAME, UPDATES_PER_FRAME, PLAYER_MOVEMENT_SPEED):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, resizable=False)
         self.start_music = arcade.load_sound("sounds/sunshine.mp3")

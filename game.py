@@ -4,7 +4,7 @@ from arcade.gui import UIManager, UITextureButton, UIImage
 from arcade.gui.widgets.layout import UIAnchorLayout, UIBoxLayout
 
 from fade_class import FadeView
-from achievements_class import *
+from constants import *
 
 SCREEN_WIDTH = 1536
 SCREEN_HEIGHT = 960
@@ -292,6 +292,18 @@ class IslandsMapView(FadeView):
         self.manager.enable()
         self.setup_widgets()
 
+        first = IslandZone(178, 85, 378, 236, 1)
+        second = IslandZone(555, 344, 402, 180, 2)
+        third = IslandZone(992, 58, 503, 364, 3)
+        fourth = IslandZone(987, 457, 451, 330, 4)
+        fifth = IslandZone(503, 616, 425, 235, 5)
+
+        self.island_zones = [first, second, third, fourth, fifth]
+
+        self.timer = 2
+        self.text1 = ""
+        self.text2 = ""
+
     def setup_widgets(self):
         texture1_normal = arcade.load_texture("images/buttons/home_button/normal.png")
         texture1_hovered = arcade.load_texture("images/buttons/home_button/hovered.PNG")
@@ -318,7 +330,96 @@ class IslandsMapView(FadeView):
             0, 0, self.window.width, self.window.height))
         self.manager.draw()
 
+        if self.timer > 0:
+            arcade.draw_text(self.text1, self.window.width / 2, 70, arcade.color.RED, 30, anchor_x="center",
+                             anchor_y="center")
+            arcade.draw_text(self.text2, self.window.width / 2, 40, arcade.color.RED, 20, anchor_x="center",
+                             anchor_y="center")
+
         self.draw_fade()
+
+    def on_mouse_press(self, x, y, button, modifiers):
+        for island in self.island_zones:
+            if island.contains(x, y):
+                self.island_click(island)
+                return
+
+    def island_click(self, island):
+        arcade.play_sound(self.click_btn_sound)
+
+        if ISLANDS_PROGRESS.get(island.island_id, False):
+            self.open_island(island.island_id)
+            self.manager.disable()
+        else:
+            self.text1 = (f"Остров {island.island_id} пока не доступен")
+            self.text2 = ("Пройдите предыдущий остров для открытия")
+            self.timer = 2
+
+    def on_update(self, delta_time):
+        super().on_update(delta_time)
+        if self.timer > 0:
+            self.timer -= delta_time
+
+    def open_island(self, island_id):
+        if island_id == 1:
+            self.start_fade_out(FirstIslandView())
+        elif island_id == 2:
+            self.start_fade_out(SecondIslandView())
+        elif island_id == 3:
+            self.start_fade_out(ThirdIslandView())
+        elif island_id == 4:
+            self.start_fade_out(FourthIslandView())
+        elif island_id == 5:
+            self.start_fade_out(FifthIslandView())
+
+
+class IslandZone:
+    def __init__(self, x, y, width, height, island_id):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.island_id = island_id
+
+    def contains(self, mouse_x, mouse_y):
+        return (
+            self.x <= mouse_x <= self.x + self.width and
+            self.y <= mouse_y <= self.y + self.height
+        )
+
+
+class FirstIslandView(FadeView):
+    def __init__(self):
+        super().__init__()
+        arcade.set_background_color(arcade.color.RED)
+
+    def on_draw(self):
+        self.clear()
+        self.draw_fade()
+
+
+class SecondIslandView(FadeView):
+    def __init__(self):
+        super().__init__()
+        arcade.set_background_color(arcade.color.ORANGE)
+
+
+class ThirdIslandView(FadeView):
+    def __init__(self):
+        super().__init__()
+        ...
+
+
+class FourthIslandView(FadeView):
+    def __init__(self):
+        super().__init__()
+        ...
+
+
+class FifthIslandView(FadeView):
+    def __init__(self):
+        super().__init__()
+        ...
 
 
 def setup_game(width=1920, height=1080, title="Wandering Paws"):
