@@ -365,6 +365,7 @@ class IslandsMapView(FadeView):
             self.timer -= delta_time
 
     def open_island(self, island_id):
+
         if island_id == 1:
             self.cur_island = IslandLevel('tilemaps/1_island.tmx')
             self.start_fade_out(self.cur_island)
@@ -405,40 +406,6 @@ class IslandZone:
             self.x <= mouse_x <= self.x + self.width and
             self.y <= mouse_y <= self.y + self.height
         )
-
-
-# class FirstIslandView(FadeView):
-#     def __init__(self):
-#         super().__init__()
-#         arcade.set_background_color(arcade.color.RED)
-#
-#     def on_draw(self):
-#         self.clear()
-#         self.draw_fade()
-#
-#
-# class SecondIslandView(FadeView):
-#     def __init__(self):
-#         super().__init__()
-#         arcade.set_background_color(arcade.color.ORANGE)
-#
-#
-# class ThirdIslandView(FadeView):
-#     def __init__(self):
-#         super().__init__()
-#         ...
-#
-#
-# class FourthIslandView(FadeView):
-#     def __init__(self):
-#         super().__init__()
-#         ...
-#
-#
-# class FifthIslandView(FadeView):
-#     def __init__(self):
-#         super().__init__()
-#         ...
 
 
 def setup_game(width=1920, height=1080, title="Wandering Paws"):

@@ -161,6 +161,8 @@ class IslandLevel(FadeView):
         if self.scene:
             self.scene.draw(pixelated=True)
 
+        self.draw_fade()
+
     def on_key_press(self, key, modifiers):
         if key == arcade.key.W:
             self.player_sprite.change_y = self.player_movement_speed
@@ -178,6 +180,7 @@ class IslandLevel(FadeView):
             self.player_sprite.change_x = 0
 
     def on_update(self, delta_time):
+        super().on_update(delta_time)
         if self.physics_engine:
             self.physics_engine.update()
 
