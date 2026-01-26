@@ -3,6 +3,10 @@ import arcade
 
 from fade_class import FadeView
 
+from puzzle_minigame import Puzzle
+from find_minigame import HiddenObjectGame
+from mouse_minigame import MouseMinigame
+
 
 class PlayerCharacter(arcade.Sprite):
     def __init__(self, updates_per_frame):
@@ -96,8 +100,9 @@ class PlayerCharacter(arcade.Sprite):
 
 
 class IslandLevel(FadeView):
-    def __init__(self, map_name):
+    def __init__(self, map_name, player_x, player_y):
         super().__init__()
+        self.minigame_collision = None
         self.updates_per_frame = 10
         self.map_name = map_name
         self.player_movement_speed = 4
@@ -106,20 +111,31 @@ class IslandLevel(FadeView):
         self.scene = None
         self.player_sprite = None
 
+        self.player_x = player_x
+        self.player_y = player_y
+
         self.physics_engine = None
 
         self.camera = None
+        self.gui_camera = None  # minigame text camera
 
         self.tile_map = None
+
+        # minigame
+        self.show_minigame_prompt = False
+        self.minigame_trigger_list = None
+        self.minigame = None
 
         arcade.set_background_color(arcade.color.BLACK)
 
     def setup(self):
         self.camera = arcade.Camera2D()
+        self.gui_camera = arcade.Camera2D()
 
         # collision
         layer_options = {
-            "collision": {"use_spatial_hash": True, }
+            "collision": {"use_spatial_hash": True},
+            "minigame": {"use_spatial_hash": True},
         }
 
         try:
@@ -134,10 +150,16 @@ class IslandLevel(FadeView):
         if self.collision:
             self.collision.visible = False
 
+        self.minigame_collision = self.scene.get_sprite_list("minigame")
+        if self.minigame_collision:
+            self.minigame_collision.visible = False
+
+        self.minigame_trigger_list = self.scene.get_sprite_list("minigame")
+
         self.player_sprite = PlayerCharacter(self.updates_per_frame)
 
-        self.player_sprite.center_x = 1500
-        self.player_sprite.center_y = 650
+        self.player_sprite.center_x = self.player_x
+        self.player_sprite.center_y = self.player_y
 
         self.scene.add_sprite("Player", self.player_sprite)
 
@@ -158,6 +180,20 @@ class IslandLevel(FadeView):
         if self.scene:
             self.scene.draw(pixelated=True)
 
+        if self.show_minigame_prompt:
+            self.gui_camera.use()
+
+            arcade.draw_rect_filled(
+                arcade.rect.LBWH(500, 30,
+                536, 30), arcade.color.BLACK_OLIVE
+            )
+            arcade.draw_text(
+                "Нажмите кнопку E чтобы пройти миниигру",
+                self.window.width // 2, 50,
+                arcade.color.WHITE, 14,
+                anchor_x="center", anchor_y="center"
+            )
+
     def on_key_press(self, key, modifiers):
         if key == arcade.key.W:
             self.player_sprite.change_y = self.player_movement_speed
@@ -167,6 +203,17 @@ class IslandLevel(FadeView):
             self.player_sprite.change_x = -self.player_movement_speed
         elif key == arcade.key.D:
             self.player_sprite.change_x = self.player_movement_speed
+
+        if key == arcade.key.E and self.show_minigame_prompt:
+            if '1' in self.map_name:
+                self.minigame = HiddenObjectGame()
+                self.minigame.bg_music = "sounds/3.mp3"
+                self.minigame.setup()
+                self.start_fade_out(self.minigame)
+            if '2' in self.map_name:
+                self.minigame = Puzzle()
+                self.minigame.setup()
+                self.start_fade_out(self.minigame)
 
     def on_key_release(self, key, modifiers):
         if key == arcade.key.W or key == arcade.key.S:
@@ -183,3 +230,12 @@ class IslandLevel(FadeView):
 
         # camera
         self.camera.position = self.player_sprite.position
+
+        # minigame collide check
+        if self.minigame_trigger_list:
+            hit_list = arcade.check_for_collision_with_list(self.player_sprite, self.minigame_trigger_list)
+
+            if len(hit_list) > 0:
+                self.show_minigame_prompt = True
+            else:
+                self.show_minigame_prompt = False

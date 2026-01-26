@@ -3,8 +3,8 @@ import random
 import time
 import math
 
-SCREEN_WIDTH = 1024
-SCREEN_HEIGHT = 768
+from fade_class import FadeView
+
 SCREEN_TITLE = "Прямоугольный пазл 6x4"
 
 ROW_COUNT = 4
@@ -21,10 +21,9 @@ class JigsawPiece(arcade.Sprite):
         self.is_snapped = False
 
 
-class MyGame(arcade.Window):
+class Puzzle(FadeView):
     def __init__(self):
-        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
-
+        super().__init__()
         self.start_music = arcade.load_sound("sounds/4.mp3")
         self.music_player = arcade.play_sound(self.start_music, loop=True)
 
@@ -50,19 +49,19 @@ class MyGame(arcade.Window):
         main_texture = arcade.load_texture(IMAGE_PATH)
 
         # texture scaling
-        scale = min(SCREEN_WIDTH * 0.8 / main_texture.width, SCREEN_HEIGHT * 0.8 / main_texture.height)
+        scale = min(1536 * 0.8 / main_texture.width, 960 * 0.8 / main_texture.height)
 
         piece_w = main_texture.width / COL_COUNT
         piece_h = main_texture.height / ROW_COUNT
 
         board_width = main_texture.width * scale
         board_height = main_texture.height * scale
-        start_x = (SCREEN_WIDTH - board_width) / 2
-        start_y = (SCREEN_HEIGHT - board_height) / 2
+        start_x = (1536 - board_width) / 2
+        start_y = (960 - board_height) / 2
 
         bg_sprite = arcade.Sprite(main_texture, scale)
-        bg_sprite.center_x = SCREEN_WIDTH / 2
-        bg_sprite.center_y = SCREEN_HEIGHT / 2
+        bg_sprite.center_x = 1536 / 2
+        bg_sprite.center_y = 960 / 2
         bg_sprite.alpha = 80
         self.background_list.append(bg_sprite)
 
@@ -84,8 +83,8 @@ class MyGame(arcade.Window):
                 piece = JigsawPiece(sub_texture, correct_x, correct_y)
                 piece.scale = scale
 
-                piece.center_x = random.randint(50, SCREEN_WIDTH - 50)
-                piece.center_y = random.randint(50, SCREEN_HEIGHT - 50)
+                piece.center_x = random.randint(50, 1536 - 50)
+                piece.center_y = random.randint(50, 960 - 50)
 
                 self.piece_list.append(piece)
 
@@ -96,15 +95,15 @@ class MyGame(arcade.Window):
 
         if not self.game_over:
             mins, secs = divmod(int(self.total_time), 60)
-            arcade.draw_text(f"Время: {mins:02d}:{secs:02d}", 20, SCREEN_HEIGHT - 40, arcade.color.WHITE, 18)
+            arcade.draw_text(f"Время: {mins:02d}:{secs:02d}", 20, 960 - 40, arcade.color.WHITE, 18)
         else:
-            arcade.draw_rect_filled(arcade.XYWH(200, 200, SCREEN_WIDTH - 200, SCREEN_HEIGHT - 200), (20, 220, 20, 85))
-            arcade.draw_text("ГОТОВО!", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 60, arcade.color.GOLD, 30,
+            arcade.draw_rect_filled(arcade.XYWH(200, 200, 1536 - 200, 960 - 200), (20, 220, 20, 85))
+            arcade.draw_text("ГОТОВО!", 1536 / 2, 960 / 2 + 60, arcade.color.GOLD, 30,
                              anchor_x="center")
 
             stars_str = "★ " * self.stars + "☆ " * (3 - self.stars)
-            arcade.draw_text(stars_str, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, arcade.color.GOLD, 40, anchor_x="center")
-            arcade.draw_text("Нажми R для новой игры", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 70, arcade.color.WHITE, 15,
+            arcade.draw_text(stars_str, 1536 / 2, 960 / 2, arcade.color.GOLD, 40, anchor_x="center")
+            arcade.draw_text("Нажми R для новой игры", 1536 / 2, 960 / 2 - 70, arcade.color.WHITE, 15,
                              anchor_x="center")
 
     def on_update(self, delta_time):
@@ -152,9 +151,3 @@ class MyGame(arcade.Window):
     def on_key_press(self, symbol, modifiers):
         if symbol == arcade.key.R:
             self.setup()
-
-
-if __name__ == "__main__":
-    game = MyGame()
-    game.setup()
-    arcade.run()

@@ -2,8 +2,8 @@ import arcade
 import random
 import math
 
-SCREEN_WIDTH = 1000
-SCREEN_HEIGHT = 700
+from fade_class import FadeView
+
 SCREEN_TITLE = "Лови мышей!"
 
 GAME_TIME = 30
@@ -15,7 +15,7 @@ MOUSE_SIZE = 30
 CAT_SIZE = 60
 
 MOUSE_SCALE = 0.15
-MOUSE_ANIM_SPEED = 0.2  # секунды на кадр
+MOUSE_ANIM_SPEED = 0.2
 
 class Mouse(arcade.Sprite):
     def __init__(self, start_x, start_y, end_x, end_y, speed=400):
@@ -72,9 +72,9 @@ class Mouse(arcade.Sprite):
             self.kill()
 
 
-class GameWindow(arcade.Window):
+class MouseMinigame(FadeView):
     def __init__(self):
-        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+        super().__init__()
 
         self.start_music = arcade.load_sound("sounds/mario.mp3")
         self.music_player = arcade.play_sound(self.start_music, loop=True)
@@ -94,12 +94,12 @@ class GameWindow(arcade.Window):
             (HOLE_SIZE, 100),
             (HOLE_SIZE, 350),
             (HOLE_SIZE, 600),
-            (SCREEN_WIDTH - HOLE_SIZE, 100),
-            (SCREEN_WIDTH - HOLE_SIZE, 350),
-            (SCREEN_WIDTH - HOLE_SIZE, 600),
-            (200, SCREEN_HEIGHT - HOLE_SIZE),
-            (500, SCREEN_HEIGHT - HOLE_SIZE),
-            (800, SCREEN_HEIGHT - HOLE_SIZE),
+            (1536 - HOLE_SIZE, 100),
+            (1536 - HOLE_SIZE, 350),
+            (1536 - HOLE_SIZE, 600),
+            (200, 960 - HOLE_SIZE),
+            (500, 960 - HOLE_SIZE),
+            (800, 960 - HOLE_SIZE),
             (200, HOLE_SIZE),
             (500, HOLE_SIZE),
             (800, HOLE_SIZE),
@@ -120,7 +120,7 @@ class GameWindow(arcade.Window):
         self.clear()
 
         arcade.draw_texture_rect(self.background_texture,
-                                 arcade.rect.XYWH(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2, SCREEN_WIDTH, SCREEN_HEIGHT))
+                                 arcade.rect.XYWH(1536 // 2, 960 // 2, 1536, 960))
 
         self.draw_walls()
 
@@ -162,11 +162,11 @@ class GameWindow(arcade.Window):
 
     def draw_ui(self):
         needed_text = f"ЛОВИ МЫШЕЙ!"
-        arcade.draw_text(needed_text, SCREEN_WIDTH // 2 - 180, SCREEN_HEIGHT - 40,
+        arcade.draw_text(needed_text, 1536 // 2 - 180, 960 - 40,
                          arcade.color.YELLOW, 42, bold=True)
 
         time_text = f"{int(self.time_left)}s"
-        arcade.draw_text(time_text, SCREEN_WIDTH // 2 - 25, SCREEN_HEIGHT - 100,
+        arcade.draw_text(time_text, 1536 // 2 - 25, 960 - 100,
                          arcade.color.WHITE, 36, bold=True)
 
         if self.game_state == "won":
@@ -181,13 +181,13 @@ class GameWindow(arcade.Window):
 
         arcade.draw_lbwh_rectangle_filled(
             100, 100,
-            SCREEN_WIDTH - 200, SCREEN_HEIGHT - 200,
+            1536 - 200, 960 - 200,
             (20, 150, 20, 200)
         )
 
         arcade.draw_text(
             "ПОБЕДА!",
-            SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 100,
+            1536 // 2, 960 // 2 + 100,
             arcade.color.GOLD, 60, bold=True, anchor_x="center"
         )
 
@@ -202,20 +202,20 @@ class GameWindow(arcade.Window):
         stars_text = "⭐" * stars
         arcade.draw_text(
             stars_text,
-            SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 20,
+            1536 // 2, 960 // 2 + 20,
             arcade.color.GOLD, 50, anchor_x="center"
         )
 
         stats_text = f"Поймано мышек: {self.score}\n Уровень: {stars}/3 ⭐"
         arcade.draw_text(
             stats_text,
-            SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 60,
+            1536 // 2, 960 // 2 - 60,
             arcade.color.WHITE, 24, anchor_x="center"
         )
 
         arcade.draw_text(
             "Нажмите R для перезагрузки",
-            SCREEN_WIDTH // 2 - 180, SCREEN_HEIGHT // 2 - 150,
+            1536 // 2 - 180, 960 // 2 - 150,
             arcade.color.WHITE, 18, anchor_x="center"
         )
 
@@ -226,26 +226,26 @@ class GameWindow(arcade.Window):
 
         arcade.draw_lbwh_rectangle_filled(
             150, 150,
-            SCREEN_WIDTH - 300, SCREEN_HEIGHT - 300,
+            1536 - 300, 960 - 300,
             (150, 20, 20, 200)
         )
 
         arcade.draw_text(
             "КОНЕЦ ИГРЫ!",
-            SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 + 100,
+            1536 // 2, 960 // 2 + 100,
             arcade.color.YELLOW, 60, bold=True, anchor_x="center"
         )
 
         stats_text = f"Поймано мышек: {self.score}  Нужно было: {MICE_NEEDED_FOR_WIN}"
         arcade.draw_text(
             stats_text,
-            SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2,
+            1536 // 2, 960 // 2,
             arcade.color.LIGHT_CYAN, 28, anchor_x="center"
         )
 
         arcade.draw_text(
             "Нажмите R для перезагрузки",
-            SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2 - 120,
+            1536 // 2, 960 // 2 - 120,
             arcade.color.WHITE, 18, anchor_x="center"
         )
 
@@ -326,13 +326,3 @@ class GameWindow(arcade.Window):
         self.mouse_spawn_timer = 0
 
         self.mice_list.clear()
-
-
-def main():
-    window = GameWindow()
-    window.setup()
-    arcade.run()
-
-
-if __name__ == "__main__":
-    main()

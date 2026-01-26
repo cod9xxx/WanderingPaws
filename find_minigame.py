@@ -1,16 +1,17 @@
 import arcade
 import time
 
-# Константы экрана
-SCREEN_WIDTH = 1536
-SCREEN_HEIGHT = 960
+from fade_class import FadeView
+
+from constants import *
+
 SCREEN_TITLE = "Поиск предметов"
 
-
-class HiddenObjectGame(arcade.Window):
+class HiddenObjectGame(FadeView):
     def __init__(self):
-        super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+        super().__init__()
 
+        self.cur_game = None
         self.background = None
         self.items_to_find = arcade.SpriteList()
         self.found_items_count = 0
@@ -43,9 +44,9 @@ class HiddenObjectGame(arcade.Window):
 
     def on_draw(self):
         arcade.draw_texture_rect(self.background,
-                                 arcade.rect.XYWH(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, SCREEN_WIDTH, SCREEN_HEIGHT))
+                                 arcade.rect.XYWH(1536 / 2, 960 / 2, 1536, 960))
 
-        arcade.draw_rect_filled(arcade.rect.XYWH(SCREEN_WIDTH / 2, 40, SCREEN_WIDTH, 80), arcade.color.ALMOND)
+        arcade.draw_rect_filled(arcade.rect.XYWH(1536 / 2, 40, 1536, 80), arcade.color.ALMOND)
 
         for i, name in enumerate(self.target_names):
             color = arcade.color.GRAY if self.found_status[i] else arcade.color.BLACK
@@ -53,14 +54,14 @@ class HiddenObjectGame(arcade.Window):
             arcade.draw_text(text, 20 + (i * 300), 30, color, 14)
 
         elapsed = int(time.time() - self.start_time) if not self.game_over else int(self.final_time)
-        arcade.draw_text(f"Время: {elapsed} сек.", SCREEN_WIDTH - 150, SCREEN_HEIGHT - 30, arcade.color.WHITE, 16)
+        arcade.draw_text(f"Время: {elapsed} сек.", 1536 - 150, 960 - 30, arcade.color.WHITE, 16)
 
         if self.game_over:
             self.draw_victory_screen()
 
     def draw_victory_screen(self):
-        arcade.draw_rect_filled(arcade.rect.LBWH(SCREEN_WIDTH / 2 - 300, SCREEN_HEIGHT / 2 - 175, 600, 400), (255, 255, 255, 220))
-        arcade.draw_text("ПОБЕДА!", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + 40, arcade.color.BLACK, 24, anchor_x="center")
+        arcade.draw_rect_filled(arcade.rect.LBWH(1536 / 2 - 300, 960 / 2 - 175, 600, 400), (255, 255, 255, 220))
+        arcade.draw_text("ПОБЕДА!", 1536 / 2, 960 / 2 + 40, arcade.color.BLACK, 24, anchor_x="center")
 
         stars = 1
         if self.final_time <= 30:
@@ -68,7 +69,10 @@ class HiddenObjectGame(arcade.Window):
         elif self.final_time <= 60:
             stars = 2
 
-        arcade.draw_text(f"Звезды: {'★' * stars}", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 - 20, arcade.color.GOLD, 20,
+        arcade.draw_text(f"Звезды: {'★' * stars}", 1536 / 2, 960 / 2 - 20, arcade.color.GOLD, 20,
+                         anchor_x="center")
+
+        arcade.draw_text(f"Нажмите esc чтобы вернуться на экран выбора", 1536 / 2, 960 / 2 - 60, arcade.color.BLACK, 16,
                          anchor_x="center")
 
     def on_mouse_press(self, x, y, button, modifiers):
@@ -88,13 +92,11 @@ class HiddenObjectGame(arcade.Window):
             if self.found_items_count == 5:
                 self.game_over = True
                 self.final_time = time.time() - self.start_time
-
-
-def main():
-    game = HiddenObjectGame()
-    game.setup()
-    arcade.run()
-
-
-if __name__ == "__main__":
-    main()
+    
+    def on_key_press(self, button, modifiers):
+        if button == arcade.key.ESCAPE:
+            ISLANDS_PROGRESS[2] = True
+            from game import IslandsMapView
+            self.cur_game = IslandsMapView()
+            self.cur_game.bg_music = 'sounds/dialogue.mp3'
+            self.start_fade_out(self.cur_game)

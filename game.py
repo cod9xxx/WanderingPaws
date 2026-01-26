@@ -6,11 +6,13 @@ from arcade.gui.widgets.layout import UIAnchorLayout, UIBoxLayout
 from fade_class import FadeView
 from constants import *
 
-from basic_level_logic import *
+from basic_level_logic import IslandLevel
 
 SCREEN_WIDTH = 1536
 SCREEN_HEIGHT = 960
 SCREEN_TITLE = "Wandering Paws"
+
+ISLAND_PLAYER_COORDS = [(1000, 1000), (1000, 1000), (1000, 1000), (1000, 1000), (1000, 1000)]
 
 
 class GameWindow(arcade.Window):
@@ -64,28 +66,28 @@ class StartView(FadeView):
 
         # Кнопка Начать
         self.btn1 = UITextureButton(texture=texture1_normal,
-                               texture_hovered=texture1_hovered,
-                               texture_pressed=texture1_pressed,
-                               scale=0.5,
-                               anchor_x="center")
+                                    texture_hovered=texture1_hovered,
+                                    texture_pressed=texture1_pressed,
+                                    scale=0.5,
+                                    anchor_x="center")
         self.btn1.on_click = self.start_game
         self.box_layout.add(self.btn1)
 
         # Кнопка Достижения
         self.btn2 = UITextureButton(texture=texture2_normal,
-                               texture_hovered=texture2_hovered,
-                               texture_pressed=texture2_pressed,
-                               scale=0.5,
-                               anchor_x="center")
+                                    texture_hovered=texture2_hovered,
+                                    texture_pressed=texture2_pressed,
+                                    scale=0.5,
+                                    anchor_x="center")
         self.btn2.on_click = self.achievements_window
         self.box_layout.add(self.btn2)
 
         # Кнопка Выход
         self.btn3 = UITextureButton(texture=texture3_normal,
-                               texture_hovered=texture3_hovered,
-                               texture_pressed=texture3_pressed,
-                               scale=0.5,
-                               anchor_x="center")
+                                    texture_hovered=texture3_hovered,
+                                    texture_pressed=texture3_pressed,
+                                    scale=0.5,
+                                    anchor_x="center")
         self.btn3.on_click = self.exit_game
         self.box_layout.add(self.btn3)
 
@@ -367,8 +369,8 @@ class IslandsMapView(FadeView):
             self.open_island(island.island_id)
             self.manager.disable()
         else:
-            self.text1 = (f"Остров {island.island_id} пока не доступен")
-            self.text2 = ("Пройдите предыдущий остров для открытия")
+            self.text1 = f"Остров {island.island_id} пока не доступен"
+            self.text2 = "Пройдите предыдущий остров для открытия"
             self.timer = 2
 
     def on_update(self, delta_time):
@@ -377,11 +379,16 @@ class IslandsMapView(FadeView):
             self.timer -= delta_time
 
     def open_island(self, island_id):
+        # open island level
+        del self.cur_island
         map_file = f'tilemaps/{island_id}_island.tmx'
-        self.cur_island = IslandLevel(map_file)
+        print(island_id)
+        self.cur_island = IslandLevel(map_file, ISLAND_PLAYER_COORDS[island_id - 1][0],
+                                      ISLAND_PLAYER_COORDS[island_id - 1][1])
         self.cur_island.bg_music = "sounds/sunshine.mp3"
         self.cur_island.setup()
         self.start_fade_out(self.cur_island)
+
 
 class IslandZone:
     def __init__(self, x, y, width, height, island_id):
@@ -393,8 +400,8 @@ class IslandZone:
 
     def contains(self, mouse_x, mouse_y):
         return (
-            self.x <= mouse_x <= self.x + self.width and
-            self.y <= mouse_y <= self.y + self.height
+                self.x <= mouse_x <= self.x + self.width and
+                self.y <= mouse_y <= self.y + self.height
         )
 
 
