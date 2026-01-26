@@ -98,9 +98,6 @@ class PlayerCharacter(arcade.Sprite):
 class IslandLevel(FadeView):
     def __init__(self, map_name):
         super().__init__()
-        self.start_music = arcade.load_sound("sounds/sunshine.mp3")
-        self.music_player = arcade.play_sound(self.start_music, volume=0.3, loop=True)
-
         self.updates_per_frame = 10
         self.map_name = map_name
         self.player_movement_speed = 4
@@ -160,8 +157,6 @@ class IslandLevel(FadeView):
 
         if self.scene:
             self.scene.draw(pixelated=True)
-
-        self.draw_fade()
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.W:

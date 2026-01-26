@@ -14,11 +14,19 @@ SCREEN_TITLE = "Wandering Paws"
 
 
 class GameWindow(arcade.Window):
-    """ Главное окно игры """
     def __init__(self, width, height, title):
         super().__init__(width, height, title, resizable=True)
-        self.start_music = arcade.load_sound("sounds/start_window.mp3")
-        self.music_player = arcade.play_sound(self.start_music, loop=True)
+        self.music_player = None
+        self.change_music("sounds/start_window.mp3")
+
+    def change_music(self, path, volume=0.5, loop=True):
+        if self.music_player:
+            arcade.stop_sound(self.music_player)
+            self.music_player = None
+
+        if path:
+            sound = arcade.load_sound(path)
+            self.music_player = arcade.play_sound(sound, volume=volume, loop=loop)
 
 
 class StartView(FadeView):
@@ -106,8 +114,12 @@ class StartView(FadeView):
 class IntroDialogView(FadeView):
     def __init__(self):
         super().__init__()
-        arcade.stop_sound(self.window.music_player)
-        arcade.play_sound(arcade.load_sound("sounds/dialogue.mp3"), loop=True)
+        if self.window.music_player:
+            arcade.stop_sound(self.window.music_player)
+
+        dialogue_music = arcade.load_sound("sounds/dialogue.mp3")
+
+        self.window.music_player = arcade.play_sound(dialogue_music, loop=True)
         self.background = arcade.load_texture("images/windows/dialogs_background.jpg")
         self.background_with_islands = arcade.load_texture("images/windows/dialogs_background_with_islands.jpg")
 
@@ -365,33 +377,11 @@ class IslandsMapView(FadeView):
             self.timer -= delta_time
 
     def open_island(self, island_id):
-
-        if island_id == 1:
-            self.cur_island = IslandLevel('tilemaps/1_island.tmx')
-            self.start_fade_out(self.cur_island)
-            self.cur_island.setup()
-            arcade.run()
-        elif island_id == 2:
-            self.cur_island = IslandLevel('tilemaps/2_island.tmx')
-            self.start_fade_out(self.cur_island)
-            self.cur_island.setup()
-            arcade.run()
-        elif island_id == 3:
-            self.cur_island = IslandLevel('tilemaps/3_island.tmx')
-            self.start_fade_out(self.cur_island)
-            self.cur_island.setup()
-            arcade.run()
-        elif island_id == 4:
-            self.cur_island = IslandLevel('tilemaps/4_island.tmx')
-            self.start_fade_out(self.cur_island)
-            self.cur_island.setup()
-            arcade.run()
-        elif island_id == 5:
-            self.cur_island = IslandLevel('tilemaps/5_island.tmx')
-            self.start_fade_out(self.cur_island)
-            self.cur_island.setup()
-            arcade.run()
-
+        map_file = f'tilemaps/{island_id}_island.tmx'
+        self.cur_island = IslandLevel(map_file)
+        self.cur_island.bg_music = "sounds/sunshine.mp3"
+        self.cur_island.setup()
+        self.start_fade_out(self.cur_island)
 
 class IslandZone:
     def __init__(self, x, y, width, height, island_id):

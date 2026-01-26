@@ -36,13 +36,16 @@ class FadeView(arcade.View):
                 self.fade_in = False
                 self.block_click = False
 
-        # Плавное исчезновение
         elif self.fade_out:
             self.fade_alpha += self.fade_speed * delta_time
             if self.fade_alpha >= 255:
                 self.fade_alpha = 255
                 self.fade_out = False
+
                 self.window.show_view(self.next_view)
+                if hasattr(self.next_view, "bg_music"):
+                    self.window.change_music(self.next_view.bg_music)
+
                 self.next_view.start_fade_in()
 
     def draw_fade(self):
