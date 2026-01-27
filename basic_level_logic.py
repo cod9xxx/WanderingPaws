@@ -206,8 +206,9 @@ class IslandLevel(FadeView):
 
         if key == arcade.key.E and self.show_minigame_prompt:
             if '1' in self.map_name:
-                self.minigame = HiddenObjectGame()
-                self.minigame.bg_music = "sounds/3.mp3"
+                self.minigame = MouseMinigame()
+                self.minigame.bg_music = "sounds/mario.mp3"
+                self.minigame.volume = 0.3
                 self.minigame.setup()
                 self.start_fade_out(self.minigame)
             if '2' in self.map_name:
@@ -216,8 +217,8 @@ class IslandLevel(FadeView):
                 self.minigame.setup()
                 self.start_fade_out(self.minigame)
             if '3' in self.map_name:
-                self.minigame = MouseMinigame()
-                self.minigame.bg_music = "sounds/mario.mp3"
+                self.minigame = HiddenObjectGame()
+                self.minigame.bg_music = "sounds/3.mp3"
                 self.minigame.setup()
                 self.start_fade_out(self.minigame)
 

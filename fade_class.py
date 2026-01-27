@@ -44,7 +44,10 @@ class FadeView(arcade.View):
 
                 self.window.show_view(self.next_view)
                 if hasattr(self.next_view, "bg_music"):
-                    self.window.change_music(self.next_view.bg_music)
+                    if hasattr(self.next_view, 'volume'):
+                        self.window.change_music(self.next_view.bg_music, volume=self.next_view.volume)
+                    else:
+                        self.window.change_music(self.next_view.bg_music)
 
                 self.next_view.start_fade_in()
 

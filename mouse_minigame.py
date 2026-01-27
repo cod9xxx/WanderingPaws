@@ -79,8 +79,6 @@ class MouseMinigame(FadeView):
 
         self.cur_game = None
         self.complete = False
-        self.start_music = arcade.load_sound("sounds/mario.mp3")
-        self.music_player = arcade.play_sound(self.start_music, loop=True)
 
         self.all_sprites_list = arcade.SpriteList()
         self.mice_list = arcade.SpriteList()
@@ -111,7 +109,7 @@ class MouseMinigame(FadeView):
         arcade.set_background_color(arcade.color.DARK_BROWN)
         self.background_texture = arcade.load_texture("images/minigame1/floor.png")
 
-        self.set_mouse_visible(False)
+        self.set_mouse_visible = False
 
     def setup(self):
         self.cat_sprite = arcade.Sprite("images/minigame1/cat.png", scale=0.15)
@@ -185,13 +183,13 @@ class MouseMinigame(FadeView):
         arcade.draw_lbwh_rectangle_filled(
             100, 100,
             self.width - 200, self.height - 200,
-            (20, 150, 20, 200)
+            (255, 255, 255, 220)
         )
 
         arcade.draw_text(
             "ПОБЕДА!",
             self.width // 2, self.height // 2 + 100,
-            arcade.color.GOLD, 60, bold=True, anchor_x="center"
+            arcade.color.BLACK, 60, bold=True, anchor_x="center"
         )
 
         stars = STARS.get(min(self.score, 20), 0)
@@ -213,13 +211,13 @@ class MouseMinigame(FadeView):
         arcade.draw_text(
             stats_text,
             self.width // 2, self.height // 2 - 60,
-            arcade.color.WHITE, 24, anchor_x="center"
+            arcade.color.GOLD, 24, anchor_x="center"
         )
 
         arcade.draw_text(
-            "Нажмите R для перезагрузки",
+            "Нажмите esc чтобы вернуться на экран выбора",
             self.width // 2 - 180, self.height // 2 - 150,
-            arcade.color.WHITE, 18, anchor_x="center"
+            arcade.color.BLACK, 16, anchor_x="center"
         )
 
     def draw_lose_screen(self):
@@ -319,9 +317,21 @@ class MouseMinigame(FadeView):
     def on_key_press(self, key, modifiers):
         if key == arcade.key.R:
             self.reset_game()
-        if key == arcade.key.ESCAPE and self.complete:
-            ISLANDS_PROGRESS[4] = True
-            self.window.go_to_map()
+        if key == arcade.key.ESCAPE:
+            if self.game_state == 'won':
+                ISLANDS_PROGRESS[2] = True
+            if self.window.music_player:
+                arcade.stop_sound(self.window.music_player)
+                self.window.music_player = None
+
+            from game import IslandsMapView
+            next_view = IslandsMapView()
+            next_view.bg_music = 'sounds/dialogue.mp3'
+
+            self.fade_alpha = 0
+            self.fade_out = True
+            self.fade_in = False
+            self.next_view = next_view
 
 
     def reset_game(self):
