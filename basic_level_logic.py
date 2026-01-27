@@ -34,17 +34,22 @@ class PlayerCharacter(arcade.Sprite):
 
         self.down_textures = [
             arcade.load_texture(f"{main_path}forward1.png"),
-            arcade.load_texture(f"{main_path}forward2.png")
+            arcade.load_texture(f"{main_path}forward2.png"),
+            arcade.load_texture(f"{main_path}forward1.png"),
+            arcade.load_texture(f"{main_path}forward2.png").flip_horizontally()
         ]
 
         self.up_textures = [
             arcade.load_texture(f"{main_path}back1.png"),
-            arcade.load_texture(f"{main_path}back2.png")
+            arcade.load_texture(f"{main_path}back2.png"),
+            arcade.load_texture(f"{main_path}back1.png"),
+            arcade.load_texture(f"{main_path}back2.png").flip_horizontally()
         ]
 
         self.right_textures = [
             arcade.load_texture(f"{main_path}right1.png"),
             arcade.load_texture(f"{main_path}right2.png"),
+            arcade.load_texture(f"{main_path}right1.png"),
             arcade.load_texture(f"{main_path}right3.png")
         ]
 
@@ -53,7 +58,6 @@ class PlayerCharacter(arcade.Sprite):
             self.left_textures.append(texture.flip_left_right())
 
     def update_animation(self, delta_time: float = 1 / 60):
-
         is_moving = self.change_x != 0 or self.change_y != 0
         if not is_moving:
             self.texture = self.idle_texture
@@ -139,7 +143,7 @@ class IslandLevel(FadeView):
         }
 
         try:
-            self.tile_map = arcade.load_tilemap(self.map_name, scaling=3, layer_options=layer_options)
+            self.tile_map = arcade.load_tilemap(self.map_name, scaling=3.5, layer_options=layer_options)
             self.scene = arcade.Scene.from_tilemap(self.tile_map)
 
         except Exception as e:

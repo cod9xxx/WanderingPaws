@@ -4,7 +4,7 @@ import arcade
 ISLANDS_PROGRESS = {
     1: True,
     2: False,
-    3: False,
+    3: True,
     4: False,
     5: False
 }
@@ -68,7 +68,7 @@ ACHIEVEMENTS = [
 ]
 
 players_achievements = {
-    "Забытая попытка" : False,
+    "Забытая попытка" : True,
     "Первый шаг" : False,
     "Кости моря" : False,
     "Нет пути назад" : False,
@@ -78,4 +78,29 @@ players_achievements = {
     "Чужие берега" : False,
     "Экспедиция завершена" : False
 }
+
+
+objects = {
+    "boat": {
+        "unlocked": False,
+        "description": "Похоже, этот остров уже посещали до нас..."
+    },
+    "campfire": {
+        "unlocked": False,
+        "description": "Костёр ещё тёплый. Кто-то был здесь совсем недавно..."
+    },
+    "house": {
+        "unlocked": False,
+        "description": "Дом пуст, но следы жизни ещё остались..."
+    },
+    "chest": {
+        "unlocked": False,
+        "description": "Сундук пережил многое. Интересно, что в нём было раньше?"
+    },
+    "fish": {
+        "unlocked": False,
+        "description": "Размер этой кости пугает. В этих водах явно скрывается нечто большее..."
+    }
+}
+
 
