@@ -212,6 +212,12 @@ class IslandLevel(FadeView):
                 self.start_fade_out(self.minigame)
             if '2' in self.map_name:
                 self.minigame = Puzzle()
+                self.minigame.bg_music = "sounds/4.mp3"
+                self.minigame.setup()
+                self.start_fade_out(self.minigame)
+            if '3' in self.map_name:
+                self.minigame = MouseMinigame()
+                self.minigame.bg_music = "sounds/mario.mp3"
                 self.minigame.setup()
                 self.start_fade_out(self.minigame)
 

@@ -5,6 +5,8 @@ import math
 
 from fade_class import FadeView
 
+from constants import *
+
 SCREEN_TITLE = "Прямоугольный пазл 6x4"
 
 ROW_COUNT = 4
@@ -24,9 +26,8 @@ class JigsawPiece(arcade.Sprite):
 class Puzzle(FadeView):
     def __init__(self):
         super().__init__()
-        self.start_music = arcade.load_sound("sounds/4.mp3")
-        self.music_player = arcade.play_sound(self.start_music, loop=True)
 
+        self.cur_game = None
         self.piece_list = None
         self.background_list = None
         self.held_piece = None
@@ -39,6 +40,7 @@ class Puzzle(FadeView):
         self.drag_offset_x = 0
         self.drag_offset_y = 0
 
+
     def setup(self):
         self.piece_list = arcade.SpriteList()
         self.background_list = arcade.SpriteList()
@@ -49,19 +51,19 @@ class Puzzle(FadeView):
         main_texture = arcade.load_texture(IMAGE_PATH)
 
         # texture scaling
-        scale = min(1536 * 0.8 / main_texture.width, 960 * 0.8 / main_texture.height)
+        scale = min(self.width * 0.8 / main_texture.width, self.height * 0.8 / main_texture.height)
 
         piece_w = main_texture.width / COL_COUNT
         piece_h = main_texture.height / ROW_COUNT
 
         board_width = main_texture.width * scale
         board_height = main_texture.height * scale
-        start_x = (1536 - board_width) / 2
-        start_y = (960 - board_height) / 2
+        start_x = (self.width - board_width) / 2
+        start_y = (self.height - board_height) / 2
 
         bg_sprite = arcade.Sprite(main_texture, scale)
-        bg_sprite.center_x = 1536 / 2
-        bg_sprite.center_y = 960 / 2
+        bg_sprite.center_x = self.width / 2
+        bg_sprite.center_y = self.height / 2
         bg_sprite.alpha = 80
         self.background_list.append(bg_sprite)
 
@@ -83,8 +85,8 @@ class Puzzle(FadeView):
                 piece = JigsawPiece(sub_texture, correct_x, correct_y)
                 piece.scale = scale
 
-                piece.center_x = random.randint(50, 1536 - 50)
-                piece.center_y = random.randint(50, 960 - 50)
+                piece.center_x = random.randint(50, int(self.width) - 50)
+                piece.center_y = random.randint(50, int(self.height) - 50)
 
                 self.piece_list.append(piece)
 
@@ -95,18 +97,24 @@ class Puzzle(FadeView):
 
         if not self.game_over:
             mins, secs = divmod(int(self.total_time), 60)
-            arcade.draw_text(f"Время: {mins:02d}:{secs:02d}", 20, 960 - 40, arcade.color.WHITE, 18)
+            arcade.draw_text(f"Время: {mins:02d}:{secs:02d}", 20, self.height - 40, arcade.color.WHITE, 18)
         else:
-            arcade.draw_rect_filled(arcade.XYWH(200, 200, 1536 - 200, 960 - 200), (20, 220, 20, 85))
-            arcade.draw_text("ГОТОВО!", 1536 / 2, 960 / 2 + 60, arcade.color.GOLD, 30,
+            arcade.draw_rect_filled(arcade.rect.LBWH(self.width / 2 - 300, self.height / 2 - 175, 600, 400), (255, 255, 255, 220))
+            arcade.draw_text("ГОТОВО!", self.width / 2, self.height / 2 + 60, arcade.color.BLACK, 30,
                              anchor_x="center")
 
             stars_str = "★ " * self.stars + "☆ " * (3 - self.stars)
-            arcade.draw_text(stars_str, 1536 / 2, 960 / 2, arcade.color.GOLD, 40, anchor_x="center")
-            arcade.draw_text("Нажми R для новой игры", 1536 / 2, 960 / 2 - 70, arcade.color.WHITE, 15,
+            arcade.draw_text(stars_str, self.width / 2, self.height / 2, arcade.color.GOLD, 40, anchor_x="center")
+            arcade.draw_text("Нажми R для новой игры", self.width / 2, self.height / 2 - 70, arcade.color.GOLD, 20,
                              anchor_x="center")
 
+            arcade.draw_text("Нажмите esc чтобы вернуться на экран выбора", self.width / 2, self.height / 2 - 100, arcade.color.BLACK, 16,
+                             anchor_x="center")
+
+            self.draw_fade()
+
     def on_update(self, delta_time):
+        super().on_update(delta_time)
         if not self.game_over:
             self.total_time = time.time() - self.start_time
             if all(p.is_snapped for p in self.piece_list):
@@ -151,3 +159,18 @@ class Puzzle(FadeView):
     def on_key_press(self, symbol, modifiers):
         if symbol == arcade.key.R:
             self.setup()
+        if symbol == arcade.key.ESCAPE:
+            if self.game_over:
+                ISLANDS_PROGRESS[3] = True
+            if self.window.music_player:
+                arcade.stop_sound(self.window.music_player)
+                self.window.music_player = None
+
+            from game import IslandsMapView
+            next_view = IslandsMapView()
+            next_view.bg_music = 'sounds/dialogue.mp3'
+
+            self.fade_alpha = 0
+            self.fade_out = True
+            self.fade_in = False
+            self.next_view = next_view

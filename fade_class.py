@@ -36,7 +36,7 @@ class FadeView(arcade.View):
                 self.fade_in = False
                 self.block_click = False
 
-        elif self.fade_out:
+        if self.fade_out:
             self.fade_alpha += self.fade_speed * delta_time
             if self.fade_alpha >= 255:
                 self.fade_alpha = 255
@@ -50,7 +50,7 @@ class FadeView(arcade.View):
 
     def draw_fade(self):
         """ Отрисовка тени """
-        if self.fade_alpha > 0:
+        if self.window and self.fade_alpha > 0:
             arcade.draw_rect_filled(arcade.rect.XYWH(self.window.width // 2,
                     self.window.height // 2, self.window.width, self.window.height),
                     (0, 0, 0, int(self.fade_alpha)))

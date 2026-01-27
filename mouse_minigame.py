@@ -2,6 +2,7 @@ import arcade
 import random
 import math
 
+from constants import *
 from fade_class import FadeView
 
 SCREEN_TITLE = "Лови мышей!"
@@ -76,6 +77,8 @@ class MouseMinigame(FadeView):
     def __init__(self):
         super().__init__()
 
+        self.cur_game = None
+        self.complete = False
         self.start_music = arcade.load_sound("sounds/mario.mp3")
         self.music_player = arcade.play_sound(self.start_music, loop=True)
 
@@ -94,12 +97,12 @@ class MouseMinigame(FadeView):
             (HOLE_SIZE, 100),
             (HOLE_SIZE, 350),
             (HOLE_SIZE, 600),
-            (1536 - HOLE_SIZE, 100),
-            (1536 - HOLE_SIZE, 350),
-            (1536 - HOLE_SIZE, 600),
-            (200, 960 - HOLE_SIZE),
-            (500, 960 - HOLE_SIZE),
-            (800, 960 - HOLE_SIZE),
+            (self.width - HOLE_SIZE, 100),
+            (self.width - HOLE_SIZE, 350),
+            (self.width - HOLE_SIZE, 600),
+            (200, self.height - HOLE_SIZE),
+            (500, self.height - HOLE_SIZE),
+            (800, self.height - HOLE_SIZE),
             (200, HOLE_SIZE),
             (500, HOLE_SIZE),
             (800, HOLE_SIZE),
@@ -120,7 +123,7 @@ class MouseMinigame(FadeView):
         self.clear()
 
         arcade.draw_texture_rect(self.background_texture,
-                                 arcade.rect.XYWH(1536 // 2, 960 // 2, 1536, 960))
+                                 arcade.rect.XYWH(self.width // 2, self.height // 2, self.width, self.height))
 
         self.draw_walls()
 
@@ -162,11 +165,11 @@ class MouseMinigame(FadeView):
 
     def draw_ui(self):
         needed_text = f"ЛОВИ МЫШЕЙ!"
-        arcade.draw_text(needed_text, 1536 // 2 - 180, 960 - 40,
+        arcade.draw_text(needed_text, self.width // 2 - 180, self.height - 40,
                          arcade.color.YELLOW, 42, bold=True)
 
         time_text = f"{int(self.time_left)}s"
-        arcade.draw_text(time_text, 1536 // 2 - 25, 960 - 100,
+        arcade.draw_text(time_text, self.width // 2 - 25, self.height - 100,
                          arcade.color.WHITE, 36, bold=True)
 
         if self.game_state == "won":
@@ -181,13 +184,13 @@ class MouseMinigame(FadeView):
 
         arcade.draw_lbwh_rectangle_filled(
             100, 100,
-            1536 - 200, 960 - 200,
+            self.width - 200, self.height - 200,
             (20, 150, 20, 200)
         )
 
         arcade.draw_text(
             "ПОБЕДА!",
-            1536 // 2, 960 // 2 + 100,
+            self.width // 2, self.height // 2 + 100,
             arcade.color.GOLD, 60, bold=True, anchor_x="center"
         )
 
@@ -202,20 +205,20 @@ class MouseMinigame(FadeView):
         stars_text = "⭐" * stars
         arcade.draw_text(
             stars_text,
-            1536 // 2, 960 // 2 + 20,
+            self.width // 2, self.height // 2 + 20,
             arcade.color.GOLD, 50, anchor_x="center"
         )
 
         stats_text = f"Поймано мышек: {self.score}\n Уровень: {stars}/3 ⭐"
         arcade.draw_text(
             stats_text,
-            1536 // 2, 960 // 2 - 60,
+            self.width // 2, self.height // 2 - 60,
             arcade.color.WHITE, 24, anchor_x="center"
         )
 
         arcade.draw_text(
             "Нажмите R для перезагрузки",
-            1536 // 2 - 180, 960 // 2 - 150,
+            self.width // 2 - 180, self.height // 2 - 150,
             arcade.color.WHITE, 18, anchor_x="center"
         )
 
@@ -224,32 +227,36 @@ class MouseMinigame(FadeView):
         self.all_sprites_list.clear()
         self.mice_list.clear()
 
-        arcade.draw_lbwh_rectangle_filled(
-            150, 150,
-            1536 - 300, 960 - 300,
-            (150, 20, 20, 200)
-        )
+        arcade.draw_rect_filled(arcade.rect.LBWH(self.width / 2 - 300, self.height / 2 - 175, 600, 400), (255, 255, 255, 220))
 
         arcade.draw_text(
             "КОНЕЦ ИГРЫ!",
-            1536 // 2, 960 // 2 + 100,
+            self.width // 2, self.height // 2 + 100,
             arcade.color.YELLOW, 60, bold=True, anchor_x="center"
         )
 
         stats_text = f"Поймано мышек: {self.score}  Нужно было: {MICE_NEEDED_FOR_WIN}"
         arcade.draw_text(
             stats_text,
-            1536 // 2, 960 // 2,
-            arcade.color.LIGHT_CYAN, 28, anchor_x="center"
+            self.width // 2, self.height // 2,
+            arcade.color.GOLD, 28, anchor_x="center"
         )
 
         arcade.draw_text(
             "Нажмите R для перезагрузки",
-            1536 // 2, 960 // 2 - 120,
-            arcade.color.WHITE, 18, anchor_x="center"
+            self.width // 2, self.height // 2 - 120,
+            arcade.color.GOLD, 18, anchor_x="center"
+        )
+
+        self.complete = True
+        arcade.draw_text(
+            "Нажмите esc чтобы вернуться на экран выбора",
+            self.width / 2, self.height / 2 - 150,
+            arcade.color.BLACK, 16, anchor_x="center"
         )
 
     def on_update(self, delta_time):
+        super().on_update(delta_time)
         if self.game_state != "playing":
             return
 
@@ -302,12 +309,6 @@ class MouseMinigame(FadeView):
         if button != arcade.MOUSE_BUTTON_LEFT:
             return
 
-        hit_list = arcade.check_for_collision_with_list(
-            arcade.Sprite("images/minigame1/cat.png"),
-            self.mice_list,
-            (x, y)
-        )
-
         for mouse in self.mice_list:
             distance = ((mouse.center_x - x) ** 2 + (mouse.center_y - y) ** 2) ** 0.5
             if distance < MOUSE_SIZE + 20:  # Зона клика
@@ -318,6 +319,10 @@ class MouseMinigame(FadeView):
     def on_key_press(self, key, modifiers):
         if key == arcade.key.R:
             self.reset_game()
+        if key == arcade.key.ESCAPE and self.complete:
+            ISLANDS_PROGRESS[4] = True
+            self.window.go_to_map()
+
 
     def reset_game(self):
         self.score = 0

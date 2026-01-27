@@ -12,14 +12,16 @@ SCREEN_WIDTH = 1536
 SCREEN_HEIGHT = 960
 SCREEN_TITLE = "Wandering Paws"
 
-ISLAND_PLAYER_COORDS = [(1000, 1000), (1000, 1000), (1000, 1000), (1000, 1000), (1000, 1000)]
+ISLAND_PLAYER_COORDS = [(1000, 1000), (1000, 1000), (1200, 700), (1000, 1000), (1000, 1000)]
 
 
 class GameWindow(arcade.Window):
     def __init__(self, width, height, title):
-        super().__init__(width, height, title, resizable=True)
+        super().__init__(width, height, title, resizable=False)
         self.music_player = None
         self.change_music("sounds/start_window.mp3")
+
+        self.map_view = IslandsMapView()
 
     def change_music(self, path, volume=0.5, loop=True):
         if self.music_player:
